@@ -1,0 +1,20 @@
+{
+  "name": "foe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/voice": "^0.16.0",
+    "discord.js": "^13.16.0",
+    "ffmpeg": "^0.0.4",
+    "libsodium-wrappers": "^0.7.11",
+    "opus": "^0.0.0",
+    "tweetnacl": "^1.0.3",
+    "ytdl-core": "^4.11.4"
+  }
+}
