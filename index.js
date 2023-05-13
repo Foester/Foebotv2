@@ -1,96 +1,93 @@
+const Discord = require('discord.js');
+const { token } = require('./config.json');
+const prefix = "*";
 const { Client, Intents } = require('discord.js');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, VoiceConnectionStatus, entersState } = require('@discordjs/voice');
-const ytdl = require('ytdl-core');
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
-
+const client = new Client({
+    intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_VOICE_STATES
+    ]
+});
+const commands = require('./commands.js');
+const events = require('./events.js');
+const music = require('./music.js');
+const { startGame, handleButton, showHighScores, quitGame } = require('./forklift.js');
+const { handleTTS, handleDisconnect } = require('./tts.js');
+const { handlePlay, handleList, handleSkip } = require('./music.js'); // Import music related handlers
 const queues = new Map();
+const connections = new Map();
+const players = new Map();
 
-const playSong = async (queue, connection) => {
-    const song = queue[0];
-    if (song) {
-        const stream = ytdl(song, { filter: 'audioonly' });
-        const resource = createAudioResource(stream);
-        const player = createAudioPlayer();
-        
-        player.play(resource);
-        
-        player.on(AudioPlayerStatus.Idle, () => {
-            queue.shift();
-            playSong(queue, connection);
-        });
-        
-        try {
-            await entersState(player, AudioPlayerStatus.Playing, 5e3);
-            connection.subscribe(player);
-        } catch (error) {
-            console.error(error);
-        }
-    } else {
-        connection.destroy();
-    }
-};
-
-client.once('ready', () => {
-    console.log('Ready!');
+client.on('ready', () => {
+  events.handleReady(client);
 });
 
-client.on('messageCreate', async message => {
-    if (message.author.bot) return;
-    
-    const args = message.content.split(' ');
-    const command = args[0];
-    const url = args[1];
+client.on('interactionCreate', interaction => {
+    handleButton(interaction);
+  });
 
-    if (command === '!play') {
-        if (message.member.voice.channel) {
-            const channel = message.member.voice.channel;
-            const connection = joinVoiceChannel({
-                channelId: channel.id,
-                guildId: channel.guild.id,
-                adapterCreator: channel.guild.voiceAdapterCreator,
-            });
-
-            let queue = queues.get(message.guild.id);
-            if (queue) {
-                queue.push(url);
-            } else {
-                queue = [url];
-                queues.set(message.guild.id, queue);
-            }
-
-            connection.on(VoiceConnectionStatus.Ready, async () => {
-                playSong(queue, connection);
-            });
-        } else {
-            message.reply('You need to join a voice channel first!');
-        }
-    } else if (command === '!list') {
-        const queue = queues.get(message.guild.id);
-        if (!queue) {
-            message.reply('The queue is currently empty!');
-        } else {
-            let reply = 'Current queue:\n';
-            queue.forEach((song, index) => {
-                reply += `${index + 1}. ${song}\n`;
-            });
-            message.reply(reply);
-        }
-    } else if (command === '!skip') {
-        const queue = queues.get(message.guild.id);
-        if (!queue) {
-            message.reply('There is no song to skip!');
-        } else {
-            queue.shift();
-            const connection = joinVoiceChannel({
-                channelId: message.member.voice.channel.id,
-                guildId: message.member.voice.channel.guild.id,
-                adapterCreator: message.member.voice.channel.guild.voiceAdapterCreator,
-            });
-            playSong(queue, connection);
-            message.reply('Skipped the current song!');
-        }
-    }
+client.on('messageCreate', (message) => {
+  events.handleMention(client, message);
 });
 
-client.login('ODU0MTcyNjAzNjU1NzgyNDMw.Gg4Qse.zlzMkXwc9cZWYrVRVDj8XimWIi25mIEfHSU9cQ');
+
+client.on('messageCreate', message => {
+    handleTTS(message);
+});
+
+  
+
+events.logDMs(client)
+
+client.on('messageCreate', async (message) => {
+  if (!message.content.startsWith(prefix)) return;
+  const args = message.content.slice(prefix.length).split(' ').slice(1);
+  const command = message.content.slice(prefix.length).split(' ')[0];
+  switch (command) {
+    case 'help':
+      commands.handleHelp(message);
+      break;
+    case 'dice':
+      commands.handleDice(message);
+      break;
+    case 'flip':
+      commands.handleFlip(message);
+      break;
+    case 'toburger':
+      commands.handleToburger(message);
+      break;
+    case 'say':
+      commands.handleSay(client, message);
+      break;
+    case 'dms':
+      events.listDMChannels(client, message);
+      break;
+    case 'play':
+      await handlePlay(message, args, queues, connections, players);
+      break;
+    case 'list':
+      handleList(message, queues);
+      break;
+      case 'skip':
+      handleSkip(message, queues, players);
+      break;
+    case 'tts':
+      handleTTS(message, connections);
+      break;
+    case 'dc':
+      handleDisconnect(message, connections);
+      break;
+    case 'startgame':
+      startGame(message, args, client);
+      break;
+    case 'highscore':
+      showHighScores(client, message);
+    case "quitgame":
+      quitGame(message);
+      break;
+  }
+});
+
+client.login(token);
