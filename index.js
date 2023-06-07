@@ -2,7 +2,6 @@ const Discord = require('discord.js');
 const { token } = require('./config.json');
 const prefix = "*";
 const { Client, Intents } = require('discord.js');
-
 const client = new Client({
     intents: [
         Intents.FLAGS.GUILDS,
@@ -12,8 +11,7 @@ const client = new Client({
 });
 const commands = require('./commands.js');
 const events = require('./events.js');
-const music = require('./music.js');
-const { startGame, handleButton, showHighScores, quitGame } = require('./forklift.js');
+const { startGame, handleButton, showHighScores, quitGame, showFoebuckBalance } = require('./forklift.js');
 const { handleTTS, handleDisconnect } = require('./tts.js');
 const { handlePlay, handleList, handleSkip } = require('./music.js'); // Import music related handlers
 const queues = new Map();
@@ -28,16 +26,43 @@ client.on('interactionCreate', interaction => {
     handleButton(interaction);
   });
 
-client.on('messageCreate', (message) => {
-  events.handleMention(client, message);
-});
-
-
+  client.on('messageCreate', message => {
+    events.handleMention(client, message);
+  });
+  
 client.on('messageCreate', message => {
     handleTTS(message);
 });
 
+client.on('message', message => {
+  if (message.content.startsWith('*dms')) {
+    events.listDMChannels(client);
+  }
+});
+client.on('message', (message) => {
+  if (message.content === '*roll') {
+    const randomNum = Math.floor(Math.random() * 100) + 1;
+    message.channel.send(`The random number is: ${randomNum}`);
+  }
+});
+
+
+
+/*client.on('ready', () => {
+  console.log('Bot is ready.');
+
+  // Replace SERVER_ID with the ID of the server you want to remove the bot from
+  const server = client.guilds.cache.get('1099024794982293556');
   
+  if (server) {
+    server.leave()
+      .then(() => console.log('Bot has been removed from the server.'))
+      .catch(console.error);
+  } else {
+    console.log('The bot is not a member of the specified server.');
+  }
+});
+*/
 
 events.logDMs(client)
 
@@ -62,7 +87,7 @@ client.on('messageCreate', async (message) => {
       commands.handleSay(client, message);
       break;
     case 'dms':
-      events.listDMChannels(client, message);
+      events.listDMChannels(client);
       break;
     case 'play':
       await handlePlay(message, args, queues, connections, players);
@@ -86,6 +111,9 @@ client.on('messageCreate', async (message) => {
       showHighScores(client, message);
     case "quitgame":
       quitGame(message);
+      break;
+    case "balance":
+      showFoebuckBalance(message);
       break;
   }
 });
