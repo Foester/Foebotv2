@@ -52,7 +52,7 @@ client.on('message', (message) => {
   console.log('Bot is ready.');
 
   // Replace SERVER_ID with the ID of the server you want to remove the bot from
-  const server = client.guilds.cache.get('1099024794982293556');
+  const server = client.guilds.cache.get('');
   
   if (server) {
     server.leave()

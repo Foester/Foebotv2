@@ -1,17 +1,3 @@
-/*function handleReady(client) {
-  console.log(`Ready to serve sir! There are ${client.guilds.cache.size} servers that I am a member of:`);
-  client.guilds.cache.forEach(guild => {
-    console.log(guild.name);
-  });
-  client.user.setPresence({
-    status: 'online',
-    activity: {
-      name: 'with your life.',
-      type: 'PLAYING'
-    }
-  });
-}*/
-
 function handleReady(client) {
   console.log(`Ready to serve, sir! I am a member of ${client.guilds.cache.size} servers:`);
   client.guilds.cache.forEach(guild => {
@@ -104,11 +90,8 @@ function handleMention (client, message) {
     ''
   ];
 
-  // Check if the message mentions the bot
   if (message.mentions.has(client.user)) {
-    // Select a random answer from the array
     const answer = answers[Math.floor(Math.random() * answers.length)];
-    // Send the selected answer to the user
     message.channel.send(answer);
   }
 }

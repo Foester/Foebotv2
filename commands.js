@@ -70,7 +70,6 @@ const prefix = '*';
   
   function handleFlip(message) {
     if (!message || !message.channel) return; // return if message or message.channel is not defined
-    // code for handling the *flip command
     const flipResult = Math.random() > 0.5 ? 'heads' : 'tails';
     message.channel.send(`The coin landed on ${flipResult}!`);
   }
@@ -82,10 +81,6 @@ const prefix = '*';
       .setTitle(`Foebot`)
       .addFields(
         { name: '__*help__', value: 'dm foe'},
-        { name: '__*truth__', value: 'answer truthfully'},
-        { name: '__*dare__', value: 'do the dares pleb'},
-        { name: '__*wyr__', value: 'would you rather?'},
-        { name: '__*nhie__', value: 'never have I ever'},
         { name: '__*toburger__', value: 'ever wondered how tall are you in cheeseburgers?'},
         { name: '__*foeball__', value: 'ask foeball'},
         { name: '__*tts__', value: 'converts text to speech in the voice channel'},
@@ -108,9 +103,8 @@ function handleSay(client, message) {
 
   // Check if the first argument is a channel, user, or a message
   const target = args[0];
-  let channel; // Define the channel variable here
+  let channel; 
   if (target.startsWith('<#') && target.endsWith('>')) {
-    // The first argument is a channel mention
     channel = message.mentions.channels.first();
     if (!channel) {
       return message.channel.send('Invalid channel mention.');
@@ -136,17 +130,16 @@ function handleSay(client, message) {
       channel = client.channels.cache.find(c => c.name === channelName);
       if (!channel) {
         // If the first argument is not a channel mention, user mention, channel ID, or channel name,
-        // it must be the message to send
         const sayMessage = args.join(' ');
         message.channel.send(sayMessage); // Send the message on the channel the *say command was posted on
-        return; // Return here to stop execution of the rest of the code
+        return; 
       }
     }
   }
   const sayMessage = args.slice(1).join(' ');
   channel.send(sayMessage);
 
-  const logChannelId = '946127792179929182'; // Replace this with the actual channel ID of your log channel
+  const logChannelId = ''; // Replace this with the actual channel ID of your log channel
   const logChannel = client.channels.cache.get(logChannelId);
   if (logChannel) {
     logChannel.send(`${message.author.username} said "${sayMessage}" on ${channel.name}`);
