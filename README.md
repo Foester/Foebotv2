@@ -7,4 +7,5 @@ Node.js: Ensure you have Node.js installed on your machine. The bot requires Nod
 
 Install Dependencies: Install the required dependencies by running the following command: npm install
 Configure the Bot: Open the config.json file in the project directory using a text editor.
+
 Set Your Discord Bot Token: Replace the empty string ("") in the token field with your own Discord bot token. If you don't have a bot token yet, you can create a new bot and obtain the token by following the official Discord Developer Portal guide.
