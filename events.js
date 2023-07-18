@@ -1,3 +1,5 @@
+const prefix = "*";
+
 function handleReady(client) {
   console.log(`Ready to serve, sir! I am a member of ${client.guilds.cache.size} servers:`);
   client.guilds.cache.forEach(guild => {
@@ -97,8 +99,53 @@ function handleMention (client, message) {
 }
 
 
+
+function handleBall (message) {
+  const answer = [ 
+    "Foeball thinks you're right.",
+    "Foeball says absolutely fucking not.", 
+    "Foeball thinks you should never ask that again.", 
+    "Foeball thinks you should ask that again later.", 
+    "Foeball says it is certain.",
+    "Foeball says don't count on it.", 
+    "Foeball thinks you should stop procastinating and fuck off to work.",
+    "Foeball says you should go to sleep. Go.",
+    "Foeball thinks sleep is for the weak, as for your question please ask again later.",
+    "Foeball thinks that it is certain.", 
+    "Foeball says it is decidedly so.", 
+    "Foeball says most likely.", 
+    "Foeball says no, just no.", 
+    "Foeball's sources say no.'",
+    "Foeball says outlook not so good.", 
+    "Foeball says outlook good.", 
+    "Foeball says try again.", 
+    "Foeball signs point to yes.",
+    "Foeball signs point to no.", 
+    "Foeball says it's very doubtful.", 
+    "Foeball says without a fucking doubt.",
+    "Foeball says yes.", 
+    "Foeball says yes, definitely.", 
+    "Foeball thinks you may rely on it."   
+  ]
+
+  const arguments = message.content.slice(prefix.length).trim().split(/ +/g);
+  const commandName = arguments.shift().toLowerCase();
+
+  if (message.content.startsWith('*foeball')) {
+    if (!arguments.length) {
+      // User didn't provide any input
+      message.channel.send("You have to tell me something silly.");
+    } else {
+      const foeball = answer[Math.floor(Math.random() * answer.length)];
+      message.channel.send(foeball);
+    }
+  }
+}
+
+
+
 module.exports = {
-  handleReady, logDMs, listDMChannels, handleMention
+  handleReady, logDMs, listDMChannels, handleMention, handleBall
 }; 
 
 

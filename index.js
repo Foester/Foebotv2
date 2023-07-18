@@ -34,15 +34,21 @@ client.on('messageCreate', message => {
     handleTTS(message);
 });
 
-client.on('message', message => {
+client.on('messageCreate', message => {
   if (message.content.startsWith('*dms')) {
     events.listDMChannels(client);
   }
 });
-client.on('message', (message) => {
+client.on('messageCreate', (message) => {
   if (message.content === '*roll') {
     const randomNum = Math.floor(Math.random() * 100) + 1;
     message.channel.send(`The random number is: ${randomNum}`);
+  }
+});
+
+client.on('messageCreate', (message) => {
+  if (message.content.startsWith('*foeball')) {
+    events.handleBall(message);
   }
 });
 
@@ -114,6 +120,9 @@ client.on('messageCreate', async (message) => {
       break;
     case "balance":
       showFoebuckBalance(message);
+      break;
+    case "foeBall":
+      events.handleBall(message);
       break;
   }
 });
